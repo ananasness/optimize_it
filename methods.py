@@ -70,5 +70,40 @@ def proj_desc(x0, f, f_grad, line,  **params):
         f_array.append(f(x))
         
     return np.array(x_array), np.array(f_array)
+
+def ang(v1, v2):
+    cosang = np.dot(v1, v2)
+    sinang = np.linalg.norm(np.cross(v1, v2))
+    return np.arctan2(sinang, cosang)
+
+def proj_ball(x, center, r): 
+    
+    if x[0]** 2 + x[1]**2 <= r**2:
+        return x
+        
+    
+    u = x - center
+    v = [1, 0]
+    angle = ang(v, u)
+    
+    return [center[0] + r *np.cos(angle),center[1] + r*np.sin(angle)]
+
+def proj_ball_desc(x0, f, f_grad, center, r, **params):
+    x = x0.copy()
+    x_array = [x]
+    f_array = [ f(x) ]
+    iters = params.get('iters', None) or 100
+    
+    for k in range(iters):
+        
+        grad = f_grad(x)
+        gamma = 1 /(1+k)
+        x = x - gamma * grad
+        x = proj_ball(x, center, r)
+        
+        x_array.append(x)
+        f_array.append(f(x))
+        
+    return np.array(x_array), np.array(f_array)
                 
         
