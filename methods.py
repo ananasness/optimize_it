@@ -4,7 +4,10 @@ import numpy as np
 def exactline(v_k, Q):
     return np.linalg.norm(v_k) ** 2 /(np.dot(np.dot(v_k, Q), v_k))
 
-def grad_desc(x0, f, f_grad, Q, **params):
+def exactline_new(x, p, Q, b):
+    return np.dot(p, np.dot(Q,x) + b) /(np.dot(np.dot(p, Q), p))
+
+def grad_desc(x0, f, f_grad, Q, b, **params):
     x = x0.copy()
     x_array = [x]
     f_array = [f(x)]
@@ -14,7 +17,7 @@ def grad_desc(x0, f, f_grad, Q, **params):
     for k in range(iters):
         grad = f_grad(x)
         
-        gamma = exactline(grad, Q)
+        gamma = exactline_new(x, grad, Q, b)
         x = x - gamma * grad
         
         x_array.append(x)
@@ -86,7 +89,7 @@ def proj_ball(x, center, r):
     v = [1, 0]
     angle = ang(v, u)
     
-    return [center[0] + r *np.cos(angle),center[1] + r*np.sin(angle)]
+    return [center[0] - r *np.cos(angle),center[1] - r*np.sin(angle)]
 
 def proj_ball_desc(x0, f, f_grad, center, r, **params):
     x = x0.copy()
